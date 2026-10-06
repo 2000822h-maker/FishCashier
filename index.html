@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>كاشير الأسماك</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Tahoma,sans-serif;
+  background:#f3f6f9;
+  color:#17202a;
+}
+header{
+  background:#087f8c;
+  color:white;
+  padding:22px 16px;
+  text-align:center;
+}
+header h1{margin:0;font-size:27px}
+header p{margin:7px 0 0;opacity:.9}
+
+.container{
+  max-width:650px;
+  margin:auto;
+  padding:15px;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-bottom:15px;
+}
+.card{
+  background:white;
+  border-radius:15px;
+  padding:17px;
+  box-shadow:0 2px 8px #00000012;
+}
+.card small{color:#777}
+.card strong{
+  display:block;
+  font-size:23px;
+  margin-top:7px;
+}
+
+.section{
+  background:white;
+  padding:17px;
+  border-radius:15px;
+  margin-bottom:15px;
+  box-shadow:0 2px 8px #00000012;
+}
+.section h2{
+  margin-top:0;
+  font-size:20px;
+}
+
+label{
+  display:block;
+  margin:10px 0 5px;
+  font-weight:bold;
+}
+input,select{
+  width:100%;
+  padding:13px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:16px;
+  background:white;
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:13px 18px;
+  font-size:16px;
+  cursor:pointer;
+}
+.primary{
+  width:100%;
+  background:#087f8c;
+  color:white;
+  margin-top:15px;
+}
+.danger{
+  background:#e74c3c;
+  color:white;
+}
+.secondary{
+  background:#e8f3f5;
+  color:#087f8c;
+}
+
+.total{
+  background:#e7f7f4;
+  padding:15px;
+  border-radius:10px;
+  margin-top:12px;
+  font-size:20px;
+  font-weight:bold;
+  text-align:center;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+}
+th,td{
+  padding:9px 5px;
+  border-bottom:1px solid #eee;
+  text-align:right;
+}
+
+.empty{
+  text-align:center;
+  color:#888;
+  padding:20px;
+}
+
+.nav{
+  position:sticky;
+  bottom:0;
+  background:white;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:5px;
+  padding:8px;
+  box-shadow:0 -2px 10px #0002;
+}
+.nav button{
+  background:white;
+  color:#555;
+}
+.nav button.active{
+  background:#087f8c;
+  color:white;
+}
+
+.page{display:none}
+.page.active{display:block}
+
+.badge{
+  background:#eef6f7;
+  padding:5px 8px;
+  border-radius:8px;
+}
+
+@media(max-width:400px){
+  .cards{grid-template-columns:1fr 1fr}
+  .card strong{font-size:19px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🐟 كاشير الأسماك</h1>
+  <p>نظام إدارة المبيعات والمخزون</p>
+</header>
+
+<div class="container">
+
+<!-- الرئيسية -->
+<div id="home" class="page active">
+
+  <div class="cards">
+    <div class="card">
+      <small>مبيعات اليوم</small>
+      <strong id="todaySales">0 د.ع</strong>
+    </div>
+
+    <div class="card">
+      <small>عدد الفواتير</small>
+      <strong id="invoiceCount">0</strong>
+    </div>
+
+    <div class="card">
+      <small>الأسماك المباعة</small>
+      <strong id="soldWeight">0 كغم</strong>
+    </div>
+
+    <div class="card">
+      <small>عدد الأسماك</small>
+      <strong id="fishCount">0</strong>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>💰 بيع جديد</h2>
+
+    <label>نوع السمك</label>
+    <select id="fishType">
+      <option value="كارب">كارب</option>
+      <option value="بوري">بوري</option>
+      <option value="شبوط">شبوط</option>
+      <option value="سمك آخر">سمك آخر</option>
+    </select>
+
+    <label>الوزن بالكيلوغرام</label>
+    <input id="weight" type="number" step="0.01" placeholder="مثال: 2.5">
+
+    <label>سعر الكيلو (د.ع)</label>
+    <input id="price" type="number" value="4000">
+
+    <div class="total">
+      الإجمالي:
+      <span id="liveTotal">0</span> د.ع
+    </div>
+
+    <button class="primary" onclick="addSale()">
+      🧾 تسجيل البيع
+    </button>
+  </div>
+
+</div>
+
+
+<!-- المبيعات -->
+<div id="sales" class="page">
+
+  <div class="section">
+    <h2>🧾 سجل المبيعات</h2>
+
+    <div id="salesList"></div>
+
+    <button class="danger" onclick="clearSales()">
+      حذف جميع المبيعات
+    </button>
+  </div>
+
+</div>
+
+
+<!-- المخزون -->
+<div id="stock" class="page">
+
+  <div class="section">
+    <h2>📦 المخزون</h2>
+
+    <label>نوع السمك</label>
+    <select id="stockType">
+      <option value="كارب">كارب</option>
+      <option value="بوري">بوري</option>
+      <option value="شبوط">شبوط</option>
+      <option value="سمك آخر">سمك آخر</option>
+    </select>
+
+    <label>عدد الأسماك</label>
+    <input id="stockFish" type="number" placeholder="مثال: 100">
+
+    <label>الوزن الكلي بالكيلوغرام</label>
+    <input id="stockWeight" type="number" step="0.01" placeholder="مثال: 100">
+
+    <button class="primary" onclick="addStock()">
+      ➕ إضافة للمخزون
+    </button>
+  </div>
+
+  <div class="section">
+    <h2>📊 المخزون الحالي</h2>
+    <div id="stockList"></div>
+  </div>
+
+</div>
+
+</div>
+
+
+<!-- التنقل -->
+<div class="nav">
+  <button class="active" onclick="showPage('home',this)">🏠 الرئيسية</button>
+  <button onclick="showPage('sales',this)">🧾 المبيعات</button>
+  <button onclick="showPage('stock',this)">📦 المخزون</button>
+</div>
+
+
+<script>
+
+let sales = JSON.parse(localStorage.getItem("fishSales") || "[]");
+let stock = JSON.parse(localStorage.getItem("fishStock") || "[]");
+
+function saveData(){
+  localStorage.setItem("fishSales",JSON.stringify(sales));
+  localStorage.setItem("fishStock",JSON.stringify(stock));
+}
+
+function money(n){
+  return Number(n).toLocaleString("ar-IQ");
+}
+
+function today(){
+  return new Date().toLocaleDateString("ar-IQ");
+}
+
+function updateTotal(){
+  let weight=Number(document.getElementById("weight").value)||0;
+  let price=Number(document.getElementById("price").value)||0;
+
+  document.getElementById("liveTotal").innerText=money(weight*price);
+}
+
+document.getElementById("weight").addEventListener("input",updateTotal);
+document.getElementById("price").addEventListener("input",updateTotal);
+
+
+function addSale(){
+
+  let type=document.getElementById("fishType").value;
+  let weight=Number(document.getElementById("weight").value);
+  let price=Number(document.getElementById("price").value);
+
+  if(weight<=0 || price<=0){
+    alert("يرجى إدخال الوزن والسعر بشكل صحيح");
+    return;
+  }
+
+  let sale={
